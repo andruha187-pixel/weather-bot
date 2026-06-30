@@ -17,16 +17,19 @@ user_id = None  # Бот будет слать уведомления тому, 
 
 def parse_temperature(text):
     """
-    Парсит температуру из METAR (формат: 19/11 или Q1013/M02)
-    В METAR UUWW температура идет в формате XX/YY (например, 20/11) 
-    или M01/M03 для минусовых температур.
+    Точный парсинг METAR строки.
+    Ищет блок вида 22/15 или M02/M05, отделенный пробелами.
     """
-    match = re.search(r'\b(M?\d{2})/(M?\d{2})\b', text)
-    if match:
-        temp_str = match.group(1)
-        if temp_str.startswith('M'):
-            return -int(temp_str[1:])
-        return int(temp_str)
+    words = text.split()
+    for word in words:
+        match = re.match(r'^(M?\d{2})/(M?\d{2})$', word)
+        if match:
+            temp_str = match.group(1)
+            if temp_str.startswith('M'):
+                return -int(temp_str[1:])
+            return int(temp_str)
+    return None
+
     return None
 
 def monitoring_loop():
